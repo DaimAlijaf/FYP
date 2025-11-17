@@ -1,3 +1,13 @@
+/**
+ * Admin Service - Administrative operations and user management
+ * Implements Admin class operations from class diagram
+ * 
+ * Key operations:
+ * - Admin.VerifyConsultant(): Approve consultant verification documents
+ * - Admin.resolve dispute(): Handle disputes between clients and consultants
+ * - User management: Ban/unban users, view all users
+ */
+
 import { User } from '../user/user.model';
 import { Consultant } from '../../models/consultant.model';
 import { Job } from '../../models/job.model';
@@ -67,6 +77,16 @@ export const unbanUser = async (userId: string) => {
   return updatedUser;
 };
 
+/**
+ * 📌 IMPORTANT: Verify Consultant
+ * Implements Admin.VerifyConsultant() from class diagram
+ * 
+ * Admin reviews and approves consultant verification documents
+ * Updates consultant's isVerified status to true
+ * 
+ * @param consultantId - Consultant ID to verify
+ * @returns Verified consultant profile
+ */
 export const verifyConsultantAdmin = async (consultantId: string) => {
   const consultant = await Consultant.findByIdAndUpdate(
     consultantId,
@@ -84,6 +104,10 @@ export const verifyConsultantAdmin = async (consultantId: string) => {
   return consultant;
 };
 
+/**
+ * Decline Consultant Verification
+ * Rejects consultant's verification request
+ */
 export const declineConsultant = async (consultantId: string) => {
   const consultant = await Consultant.findByIdAndUpdate(
     consultantId,
@@ -98,6 +122,10 @@ export const declineConsultant = async (consultantId: string) => {
   return consultant;
 };
 
+/**
+ * Get Pending Consultant Verifications
+ * Lists all consultants awaiting admin approval
+ */
 export const getPendingConsultants = async () => {
   const consultants = await Consultant.find({ isVerified: false })
     .populate('userId', 'name email profileImage phone')

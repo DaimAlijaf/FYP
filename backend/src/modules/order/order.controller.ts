@@ -44,12 +44,14 @@ export const addMilestone = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const completeMilestone = catchAsync(async (req: Request, res: Response) => {
-  const order = await orderService.completeMilestone(req.params.id, req.body.milestoneId);
+  const { id, milestoneId } = req.params;
+  const order = await orderService.completeMilestone(id, milestoneId);
   res.status(200).json({ success: true, data: order });
 });
 
 export const payMilestone = catchAsync(async (req: Request, res: Response) => {
-  const order = await orderService.payMilestone(req.params.id, req.body.milestoneId);
+  const { id, milestoneId } = req.params;
+  const order = await orderService.payMilestone(id, milestoneId);
   res.status(200).json({ success: true, data: order });
 });
 

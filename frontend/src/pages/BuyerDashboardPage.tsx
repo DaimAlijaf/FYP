@@ -877,7 +877,32 @@ const BuyerDashboardPage = () => {
           </>
         )}
 
-        {/* Messages moved to dedicated /messages page */}
+        {/* Right Sidebar - Messages */}
+        <aside className={styles.rightSidebar}>
+          <div className={styles.messagesSection}>
+            <div className={styles.messagesSectionHeader}>
+              <h3 className={styles.messagesTitle}>Messages</h3>
+              <button 
+                className={styles.viewAllMessagesButton}
+                onClick={() => navigate('/messages')}
+              >
+                View All
+              </button>
+            </div>
+            <p className={styles.messagesDescription}>
+              Quick access to your recent conversations with consultants.
+            </p>
+            <button
+              className={styles.openMessagesButton}
+              onClick={() => navigate('/messages')}
+            >
+              Open Messaging Center
+            </button>
+            <p className={styles.messagesHint}>
+              Connect with consultants, discuss project details, and manage all communications in one place.
+            </p>
+          </div>
+        </aside>
       </div>
     </div>
   );

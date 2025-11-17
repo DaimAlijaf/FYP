@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 import { Consultant } from '../../models/consultant.model';
 import { ApiError } from '../../utils/ApiError';
 
@@ -43,6 +45,11 @@ export const getAllConsultants = async (query: any) => {
 };
 
 export const getConsultantById = async (id: string) => {
+  // Validate ObjectId format
+  if (!Types.ObjectId.isValid(id)) {
+    throw new ApiError(400, 'Invalid consultant ID format');
+  }
+  
   const consultant = await Consultant.findById(id).populate('userId', 'name email profileImage isOnline phone isBanned');
   if (!consultant) {
     throw new ApiError(404, 'Consultant not found');
@@ -61,6 +68,26 @@ export const updateConsultant = async (id: string, updateData: any) => {
   if (!consultant) {
     throw new ApiError(404, 'Consultant not found');
   }
+  return consultant.populate('userId', 'name email profileImage isBanned');
+};
+
+export const uploadVerificationDocuments = async (id: string, documents: { idCardFront?: string; idCardBack?: string; supportingDocuments?: string[] }) => {
+  const consultant = await Consultant.findById(id);
+  if (!consultant) {
+    throw new ApiError(404, 'Consultant not found');
+  }
+
+  if (documents.idCardFront) {
+    consultant.idCardFront = documents.idCardFront;
+  }
+  if (documents.idCardBack) {
+    consultant.idCardBack = documents.idCardBack;
+  }
+  if (documents.supportingDocuments) {
+    consultant.supportingDocuments = [...(consultant.supportingDocuments || []), ...documents.supportingDocuments];
+  }
+
+  await consultant.save();
   return consultant.populate('userId', 'name email profileImage isBanned');
 };
 

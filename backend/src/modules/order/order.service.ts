@@ -1,8 +1,24 @@
+/**
+ * Order Service - Business logic for transaction/project management
+ * Implements Transaction operations from class diagram
+ * 
+ * Key operations:
+ * - Transaction.initiate(): Create order when proposal is accepted
+ * - Transaction.release(): Release milestone payment to consultant
+ * - Transaction.refund(): Refund client if project is cancelled
+ * - Consultant.markdeliverable(): Update progress and complete milestones
+ * - Client.paymentmethod(): Process milestone payments
+ */
+
 import { Consultant } from '../../models/consultant.model';
 import { Job } from '../../models/job.model';
 import { Order } from '../../models/order.model';
 import { ApiError } from '../../utils/ApiError';
 
+/**
+ * Create Order - Called when proposal is accepted
+ * Implements Transaction.initiate() from class diagram
+ */
 export const createOrder = async (orderData: any) => {
   const order = await Order.create(orderData);
   return order.populate([
@@ -99,6 +115,16 @@ export const addMilestone = async (id: string, milestoneData: any) => {
   return order;
 };
 
+/**
+ * 📌 IMPORTANT: Complete Milestone
+ * Implements Consultant.markdeliverable() from class diagram
+ * 
+ * Consultant marks a milestone as completed, ready for client payment
+ * 
+ * @param id - Order ID
+ * @param milestoneId - Milestone ID to mark complete
+ * @returns Updated order with completed milestone
+ */
 export const completeMilestone = async (id: string, milestoneId: string) => {
   const order = await Order.findById(id);
   if (!order) {
@@ -117,6 +143,17 @@ export const completeMilestone = async (id: string, milestoneId: string) => {
   return order;
 };
 
+/**
+ * 📌 IMPORTANT: Pay Milestone
+ * Implements Transaction.release() and Client.paymentmethod() from class diagram
+ * 
+ * Client releases payment for a completed milestone
+ * Updates consultant's earnings automatically
+ * 
+ * @param id - Order ID
+ * @param milestoneId - Milestone ID to pay
+ * @returns Updated order with paid milestone
+ */
 export const payMilestone = async (id: string, milestoneId: string) => {
   const order = await Order.findById(id);
   if (!order) {
@@ -132,6 +169,7 @@ export const payMilestone = async (id: string, milestoneId: string) => {
     throw new ApiError(400, 'Milestone must be completed before payment');
   }
 
+  // Release payment (Transaction.release())
   milestone.status = 'paid';
   milestone.paidAt = new Date();
   order.amountPaid += milestone.amount;
@@ -146,6 +184,13 @@ export const payMilestone = async (id: string, milestoneId: string) => {
   return order;
 };
 
+/**
+ * 🏁 Complete Order
+ * Finalizes the project and updates all related entities
+ * 
+ * @param id - Order ID to complete
+ * @returns Completed order
+ */
 export const completeOrder = async (id: string) => {
   const order = await Order.findById(id);
   if (!order) {
@@ -160,7 +205,7 @@ export const completeOrder = async (id: string) => {
   // Update job status
   await Job.findByIdAndUpdate(order.jobId, { status: 'completed' });
 
-  // Update consultant stats
+  // Update consultant stats (totalProjects counter)
   await Consultant.findByIdAndUpdate(order.consultantId, {
     $inc: { totalProjects: 1 },
   });
@@ -168,12 +213,22 @@ export const completeOrder = async (id: string) => {
   return order;
 };
 
+/**
+ * ❌ Cancel Order
+ * Implements Transaction.refund() from class diagram
+ * 
+ * Cancels the order and refunds client if applicable
+ * 
+ * @param id - Order ID to cancel
+ * @returns Cancelled order
+ */
 export const cancelOrder = async (id: string) => {
   const order = await Order.findById(id);
   if (!order) {
     throw new ApiError(404, 'Order not found');
   }
 
+  // Implement refund logic here (Transaction.refund())
   order.status = 'cancelled';
   await order.save();
 

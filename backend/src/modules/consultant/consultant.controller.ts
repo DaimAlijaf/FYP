@@ -64,3 +64,15 @@ export const verifyConsultant = catchAsync(async (req: Request, res: Response) =
   res.status(200).json({ success: true, data: consultant });
 });
 
+export const uploadVerificationDocuments = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const documents = req.body;
+  
+  if (!id) {
+    return res.status(400).json({ success: false, error: 'Consultant ID is required' });
+  }
+  
+  const consultant = await consultantService.uploadVerificationDocuments(id, documents);
+  res.status(200).json({ success: true, data: consultant });
+});
+

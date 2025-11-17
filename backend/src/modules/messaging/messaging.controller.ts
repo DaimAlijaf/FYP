@@ -5,7 +5,7 @@ import { ApiError } from '../../utils/ApiError';
 
 export const createMessage = catchAsync(async (req: Request, res: Response) => {
   const senderId = req.user?.id;
-  const { receiverId, content } = req.body;
+  const { receiverId, content, attachments } = req.body;
 
   if (!senderId) {
     throw new ApiError(401, 'Authentication required');
@@ -14,7 +14,7 @@ export const createMessage = catchAsync(async (req: Request, res: Response) => {
     throw new ApiError(400, 'Receiver ID and content are required');
   }
 
-  const message = await messagingService.createMessage(senderId, receiverId, content);
+  const message = await messagingService.createMessage(senderId, receiverId, content, attachments);
   res.status(201).json({ success: true, data: message });
 });
 

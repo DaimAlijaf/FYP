@@ -4,7 +4,7 @@ import { User } from '../user/user.model';
 import { ApiError } from '../../utils/ApiError';
 import { Types } from 'mongoose';
 
-export const createMessage = async (senderId: string, receiverId: string, content: string) => {
+export const createMessage = async (senderId: string, receiverId: string, content: string, attachments?: string[]) => {
   // Validate users exist
   const sender = await User.findById(senderId);
   const receiver = await User.findById(receiverId);
@@ -13,54 +13,67 @@ export const createMessage = async (senderId: string, receiverId: string, conten
     throw new ApiError(404, 'User not found');
   }
 
+  if (senderId === receiverId) {
+    throw new ApiError(400, 'Cannot send message to yourself');
+  }
+
   // Find or create conversation
   let conversation = await Conversation.findOne({
     participants: { $all: [senderId, receiverId] },
   });
 
   if (!conversation) {
+    const unreadMap = new Map();
+    unreadMap.set(receiverId.toString(), 0);
+    unreadMap.set(senderId.toString(), 0);
+    
     conversation = await Conversation.create({
       participants: [senderId, receiverId],
-      unreadCount: new Map([[receiverId, 0]]),
+      unreadCount: unreadMap,
     });
   }
 
   // Create message
   const message = await Message.create({
-    conversationId: conversation._id,
-    sender: senderId,
-    receiver: receiverId,
+    conversationId: conversation._id.toString(),
+    senderId,
+    receiverId,
     content,
-    readBy: [senderId], // Sender has read their own message
+    isRead: false,
+    attachments: attachments || [],
   });
 
   // Update conversation
-  conversation.lastMessage = message._id;
+  conversation.lastMessage = content.substring(0, 100); // Store preview
+  conversation.lastMessageAt = new Date();
   const receiverUnreadCount = conversation.unreadCount.get(receiverId.toString()) || 0;
   conversation.unreadCount.set(receiverId.toString(), receiverUnreadCount + 1);
   await conversation.save();
 
   // Populate and return
   const populatedMessage = await Message.findById(message._id)
-    .populate('sender', 'name email profileImage isOnline')
-    .populate('receiver', 'name email profileImage isOnline');
+    .populate('senderId', 'name email profileImage isOnline')
+    .populate('receiverId', 'name email profileImage isOnline');
 
   return populatedMessage;
 };
 
 export const getConversations = async (userId: string) => {
   const conversations = await Conversation.find({ participants: userId })
-    .populate('participants', 'name email profileImage isOnline')
-    .populate({
-      path: 'lastMessage',
-      populate: {
-        path: 'sender',
-        select: 'name profileImage',
-      },
-    })
-    .sort({ updatedAt: -1 });
+    .populate('participants', 'name email profileImage isOnline accountType')
+    .sort({ lastMessageAt: -1, updatedAt: -1 });
 
-  return conversations;
+  // Format conversations with unread count for current user
+  const formattedConversations = conversations.map((conv) => {
+    const unreadCount = conv.unreadCount.get(userId.toString()) || 0;
+    return {
+      ...conv.toObject(),
+      unreadCount,
+      otherUser: conv.participants.find((p: any) => p._id.toString() !== userId.toString()),
+    };
+  });
+
+  return formattedConversations;
 };
 
 export const getMessages = async (userId: string, otherUserId: string, page: number = 1, limit: number = 50) => {
@@ -69,17 +82,17 @@ export const getMessages = async (userId: string, otherUserId: string, page: num
   });
 
   if (!conversation) {
-    return { messages: [], pagination: { total: 0, page, limit, pages: 0 } };
+    return { messages: [], pagination: { total: 0, page, limit, pages: 0 }, conversationId: null };
   }
 
-  const messages = await Message.find({ conversationId: conversation._id, isDeleted: false })
-    .populate('sender', 'name profileImage isOnline')
-    .populate('receiver', 'name profileImage isOnline')
+  const messages = await Message.find({ conversationId: conversation._id.toString() })
+    .populate('senderId', 'name profileImage isOnline accountType')
+    .populate('receiverId', 'name profileImage isOnline accountType')
     .sort({ createdAt: -1 })
     .skip((page - 1) * limit)
     .limit(limit);
 
-  const total = await Message.countDocuments({ conversationId: conversation._id, isDeleted: false });
+  const total = await Message.countDocuments({ conversationId: conversation._id.toString() });
 
   return {
     messages: messages.reverse(),
@@ -89,6 +102,7 @@ export const getMessages = async (userId: string, otherUserId: string, page: num
       limit,
       pages: Math.ceil(total / limit),
     },
+    conversationId: conversation._id.toString(),
   };
 };
 
@@ -101,17 +115,19 @@ export const markMessagesAsRead = async (userId: string, otherUserId: string) =>
     throw new ApiError(404, 'Conversation not found');
   }
 
+  // Mark all unread messages from otherUserId as read
   await Message.updateMany(
     {
-      conversationId: conversation._id,
-      receiver: userId,
-      readBy: { $ne: userId },
+      conversationId: conversation._id.toString(),
+      receiverId: userId,
+      isRead: false,
     },
     {
-      $addToSet: { readBy: userId },
+      isRead: true,
     },
   );
 
+  // Reset unread count for this user
   conversation.unreadCount.set(userId.toString(), 0);
   await conversation.save();
 
@@ -132,11 +148,10 @@ export const deleteMessage = async (messageId: string, userId: string) => {
   if (!message) {
     throw new ApiError(404, 'Message not found');
   }
-  if (message.sender.toString() !== userId.toString()) {
+  if (message.senderId.toString() !== userId.toString()) {
     throw new ApiError(403, 'Unauthorized to delete this message');
   }
 
-  message.isDeleted = true;
-  await message.save();
+  await Message.findByIdAndDelete(messageId);
   return { success: true, message: 'Message deleted' };
 };

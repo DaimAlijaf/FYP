@@ -1,8 +1,25 @@
+/**
+ * Proposal Service - Business logic for bid management
+ * Implements Bid/Proposal operations from class diagram
+ * 
+ * Key operations:
+ * - Consultant.submitbid(): Create new proposal
+ * - Client.acceptbid(): Accept proposal and create order
+ * - Bid.withdraw(): Consultant withdraws their bid
+ */
+
 import { Job } from '../../models/job.model';
 import { Proposal } from '../../models/proposal.model';
 import { Order } from '../../models/order.model';
 import { ApiError } from '../../utils/ApiError';
 
+/**
+ * 📌 IMPORTANT: Create Proposal (Consultant submits bid)
+ * Implements Consultant.submitbid() from class diagram
+ * 
+ * @param proposalData - Bid details including amount, timeline, cover letter
+ * @returns Created proposal with populated references
+ */
 export const createProposal = async (proposalData: any) => {
   const proposal = await Proposal.create(proposalData);
   
@@ -90,6 +107,19 @@ export const updateProposal = async (id: string, updateData: any) => {
   return proposal;
 };
 
+/**
+ * 📌 IMPORTANT: Accept Proposal (Client accepts bid)
+ * Implements Client.acceptbid() from class diagram
+ * 
+ * This is a critical transaction that:
+ * 1. Marks proposal as accepted
+ * 2. Changes job status to in_progress
+ * 3. Rejects all other proposals for this job
+ * 4. Creates a new Order (Transaction) - implements Transaction.initiate()
+ * 
+ * @param id - Proposal ID to accept
+ * @returns Accepted proposal and newly created order
+ */
 export const acceptProposal = async (id: string) => {
   const proposal = await Proposal.findById(id)
     .populate('jobId')
@@ -123,7 +153,7 @@ export const acceptProposal = async (id: string) => {
     { status: 'rejected' },
   );
 
-  // Create an order
+  // Create an order (implements Transaction.initiate())
   const order = await Order.create({
     jobId: proposal.jobId,
     buyerId: job?.buyerId,

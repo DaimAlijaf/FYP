@@ -265,12 +265,47 @@ const MessagingPage = () => {
 
   return (
     <div className={styles.messagingPage}>
-      {/* Right Sidebar - Conversations List */}
+      {/* Conversations List */}
       <aside className={styles.conversationsSidebar}>
+        <div className={styles.topBar}>
+          <div className={styles.logoSection}>
+            <button 
+              className={styles.backToDashboardSidebar} 
+              onClick={() => {
+                const role = currentUser?.role || 'buyer';
+                if (role === 'consultant') {
+                  navigate('/consultant-dashboard');
+                } else if (role === 'admin') {
+                  navigate('/admin-dashboard');
+                } else {
+                  navigate('/buyer-dashboard');
+                }
+              }}
+              title="Back to Dashboard"
+            >
+              ← Back
+            </button>
+            <img src="/src/assets/logo.png" alt="Expert Raah" className={styles.logoImage} />
+            <h1 className={styles.logoText}>EXPERT RAAH</h1>
+          </div>
+          <div className={styles.topBarActions}>
+            <button className={styles.topBarBtn} title="Notifications">
+              🔔
+              {getTotalUnread() > 0 && <span className={styles.notificationBadge}>{getTotalUnread()}</span>}
+            </button>
+            {currentUser?.profileImage ? (
+              <img src={currentUser.profileImage} alt={currentUser.name} className={styles.userAvatar} />
+            ) : (
+              <FaUserCircle className={styles.userAvatar} />
+            )}
+          </div>
+        </div>
+
         <div className={styles.conversationsHeader}>
           <h2 className={styles.conversationsTitle}>
             Messages {getTotalUnread() > 0 && <span className={styles.unreadBadge}>{getTotalUnread()}</span>}
           </h2>
+          <span className={styles.dropdownIcon}>▼</span>
         </div>
 
         <div className={styles.searchContainer}>
@@ -325,7 +360,7 @@ const MessagingPage = () => {
                     </div>
                     <div className={styles.conversationBottom}>
                       <p className={styles.conversationPreview}>
-                        {conversation.lastMessage?.content || 'No messages yet'}
+                        {conversation.lastMessage?.content || 'Such a great consultation session it was. WI...'}
                       </p>
                       {unreadCount > 0 && <span className={styles.unreadCount}>{unreadCount}</span>}
                     </div>
@@ -337,13 +372,29 @@ const MessagingPage = () => {
         </div>
       </aside>
 
-      {/* Center - Chat Area */}
+      {/* Right - Chat Area */}
       <main className={styles.chatArea}>
         {selectedUser ? (
           <>
             {/* Chat Header */}
             <header className={styles.chatHeader}>
               <div className={styles.chatHeaderLeft}>
+                <button 
+                  className={styles.backToDashboard} 
+                  onClick={() => {
+                    const role = currentUser?.role || 'buyer';
+                    if (role === 'consultant') {
+                      navigate('/consultant-dashboard');
+                    } else if (role === 'admin') {
+                      navigate('/admin-dashboard');
+                    } else {
+                      navigate('/buyer-dashboard');
+                    }
+                  }}
+                  title="Back to Dashboard"
+                >
+                  ← Back
+                </button>
                 <div className={styles.chatHeaderAvatar}>
                   {selectedUser.profileImage ? (
                     <img src={selectedUser.profileImage} alt={selectedUser.name} />
@@ -355,9 +406,9 @@ const MessagingPage = () => {
                   <h3 className={styles.chatHeaderName}>{selectedUser.name}</h3>
                   <span className={styles.chatHeaderStatus}>
                     {selectedUser.isOnline ? (
-                      <span className={styles.activeStatus}>● Active Now</span>
+                      <span className={styles.activeStatus}>Active Now</span>
                     ) : (
-                      'Offline'
+                      'Mon, 09:40 AM'
                     )}
                   </span>
                 </div>
@@ -393,7 +444,7 @@ const MessagingPage = () => {
                         <span>{group.date}</span>
                       </div>
                       {group.messages.map((message) => {
-                        const isSent = message.sender?._id === currentUser?.id;
+                        const isSent = message.sender?._id === currentUser?._id;
                         return (
                           <div
                             key={message._id}
@@ -423,19 +474,24 @@ const MessagingPage = () => {
 
             {/* Message Input */}
             <form onSubmit={sendMessage} className={styles.messageInputContainer}>
-              <button type="button" className={styles.attachmentBtn} title="Attach file">
-                <FaPaperclip />
-              </button>
-              <input
-                ref={inputRef}
-                type="text"
-                placeholder="Type a message"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className={styles.messageInput}
-                disabled={sending}
-              />
+              <div className={styles.inputWrapper}>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  placeholder="Type a message"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className={styles.messageInput}
+                  disabled={sending}
+                />
+                <button type="button" className={styles.attachmentBtn} title="Attach file">
+                  <FaPaperclip />
+                </button>
+                <button type="button" className={styles.emojiBtn} title="Add emoji">
+                  😊
+                </button>
+              </div>
               <button
                 type="submit"
                 className={styles.sendBtn}
