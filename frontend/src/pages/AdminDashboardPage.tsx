@@ -17,16 +17,10 @@ const AdminDashboardPage = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Check if user is authenticated and is admin
-    const user = authService.getCurrentUser();
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-    
+    // Admin dashboard can be accessed without login
     fetchConsultants();
     fetchBuyers();
-  }, [navigate]);
+  }, []);
 
   const fetchConsultants = async () => {
     try {

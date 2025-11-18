@@ -17,7 +17,7 @@ export const createUser = async (payload: { name: string; email: string; passwor
   return user;
 };
 
-export const getUserByEmail = (email: string) => User.findOne({ email }).exec();
+export const getUserByEmail = (email: string) => User.findOne({ email }).select('+password').exec();
 
 export const getUserById = (id: string) => User.findById(id).select('-password').exec();
 
