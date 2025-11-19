@@ -26,7 +26,6 @@ const ContactSection = () => {
 
     try {
       setIsSubmitting(true);
-      // Send contact message to admin
       await httpClient.post('/messages/contact', {
         firstName: form.firstName,
         lastName: form.lastName,
