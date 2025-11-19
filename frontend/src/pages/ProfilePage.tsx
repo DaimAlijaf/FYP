@@ -124,10 +124,10 @@ const ProfilePage = () => {
   };
 
   const addSpecialization = () => {
-    if (newSpecialization.trim() && !consultantData.specialization.includes(newSpecialization.trim())) {
+    if (newSpecialization && !consultantData.specialization.includes(newSpecialization)) {
       setConsultantData(prev => ({
         ...prev,
-        specialization: [...prev.specialization, newSpecialization.trim()]
+        specialization: [...prev.specialization, newSpecialization]
       }));
       setNewSpecialization('');
     }
@@ -433,20 +433,23 @@ const ProfilePage = () => {
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label className={styles.label}>Specialization / Areas of Expertise *</label>
+                    <label className={styles.label}>Specialization / Domain of Expertise *</label>
                     <div className={styles.tagInput}>
-                      <input
-                        type="text"
+                      <select
                         value={newSpecialization}
                         onChange={(e) => setNewSpecialization(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSpecialization())}
                         className={styles.input}
-                        placeholder="e.g., Education, Business, Legal"
-                      />
+                      >
+                        <option value="">Select domain</option>
+                        <option value="Education">Education</option>
+                        <option value="Legal">Legal</option>
+                        <option value="Business">Business</option>
+                      </select>
                       <button 
                         type="button" 
                         onClick={addSpecialization}
                         className={styles.addButton}
+                        disabled={!newSpecialization}
                       >
                         Add
                       </button>

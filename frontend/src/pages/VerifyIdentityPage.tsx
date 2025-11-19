@@ -7,6 +7,12 @@ const VerifyIdentityPage = () => {
   const [frontIdImage, setFrontIdImage] = useState<File | null>(null);
   const [backIdImage, setBackIdImage] = useState<File | null>(null);
   const [supportingDocs, setSupportingDocs] = useState<File[]>([]);
+  const [domain, setDomain] = useState<string>('');
+  const [title, setTitle] = useState<string>('');
+  const [bio, setBio] = useState<string>('');
+  const [hourlyRate, setHourlyRate] = useState<string>('');
+  const [experience, setExperience] = useState<string>('');
+  const [location, setLocation] = useState<string>('');
   const navigate = useNavigate();
 
   const handleFileUpload = (
@@ -35,10 +41,26 @@ const VerifyIdentityPage = () => {
       return;
     }
 
+    if (!domain) {
+      alert('Please select your domain of expertise');
+      return;
+    }
+
+    if (!title || !bio || !hourlyRate || !experience || !location) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
     console.log('Verifying identity...', {
       frontIdImage,
       backIdImage,
       supportingDocs,
+      domain,
+      title,
+      bio,
+      hourlyRate,
+      experience,
+      location,
     });
 
     // Handle verification logic here
@@ -106,6 +128,92 @@ const VerifyIdentityPage = () => {
                 </p>
               </label>
               <p className={styles.uploadCaption}>Back Side of your Identity Card</p>
+            </div>
+          </div>
+
+          {/* Consultant Profile Fields */}
+          <div className={styles.profileSection}>
+            <h3 className={styles.sectionTitle}>Consultant Information</h3>
+            
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Domain of Expertise *</label>
+              <select 
+                className={styles.select}
+                value={domain}
+                onChange={(e) => setDomain(e.target.value)}
+                required
+              >
+                <option value="">Select your domain</option>
+                <option value="Education">Education</option>
+                <option value="Legal">Legal</option>
+                <option value="Business">Business</option>
+              </select>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Professional Title *</label>
+              <input 
+                type="text"
+                className={styles.input}
+                placeholder="e.g., Business Consultant, Legal Advisor"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Bio *</label>
+              <textarea 
+                className={styles.textarea}
+                placeholder="Tell us about your expertise and experience"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                rows={4}
+                required
+              />
+            </div>
+
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Hourly Rate (Rs) *</label>
+                <input 
+                  type="number"
+                  className={styles.input}
+                  placeholder="e.g., 5000"
+                  value={hourlyRate}
+                  onChange={(e) => setHourlyRate(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Experience (Years) *</label>
+                <input 
+                  type="text"
+                  className={styles.input}
+                  placeholder="e.g., 5 years"
+                  value={experience}
+                  onChange={(e) => setExperience(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Location *</label>
+              <select 
+                className={styles.select}
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                required
+              >
+                <option value="">Select your location</option>
+                <option value="Karachi">Karachi</option>
+                <option value="Lahore">Lahore</option>
+                <option value="Islamabad">Islamabad</option>
+                <option value="Rawalpindi">Rawalpindi</option>
+              </select>
             </div>
           </div>
 
