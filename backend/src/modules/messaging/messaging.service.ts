@@ -3,6 +3,7 @@ import { Conversation } from '../../models/conversation.model';
 import { User } from '../user/user.model';
 import { ApiError } from '../../utils/ApiError';
 import { Types } from 'mongoose';
+import { hashPassword } from '../../utils/password';
 
 export const createMessage = async (senderId: string, receiverId: string, content: string, attachments?: string[]) => {
   // Validate users exist
@@ -154,4 +155,55 @@ export const deleteMessage = async (messageId: string, userId: string) => {
 
   await Message.findByIdAndDelete(messageId);
   return { success: true, message: 'Message deleted' };
+};
+
+export const sendContactMessage = async (contactData: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  message: string;
+}) => {
+  // Find or create admin user
+  let admin = await User.findOne({ roles: 'admin' });
+  
+  if (!admin) {
+    // Create a default admin user if none exists
+    const hashedPassword = await hashPassword('admin123');
+    admin = await User.create({
+      name: 'Admin',
+      email: 'admin@expertraah.com',
+      password: hashedPassword,
+      accountType: 'buyer',
+      roles: ['admin'],
+      isVerified: true,
+    });
+  }
+
+  // Create or find guest user for this email
+  let guestUser = await User.findOne({ email: contactData.email });
+  
+  if (!guestUser) {
+    const hashedPassword = await hashPassword('guest_' + Math.random().toString(36).substring(7));
+    guestUser = await User.create({
+      name: `${contactData.firstName} ${contactData.lastName}`.trim() || 'Guest',
+      email: contactData.email,
+      password: hashedPassword,
+      accountType: 'buyer',
+      roles: ['guest'],
+      isVerified: false,
+    });
+  }
+
+  // Create message from guest to admin
+  const message = await createMessage(
+    guestUser._id.toString(),
+    admin._id.toString(),
+    `Contact Form Message:\n\nFrom: ${contactData.firstName} ${contactData.lastName}\nEmail: ${contactData.email}\n\n${contactData.message}`,
+  );
+
+  return {
+    success: true,
+    message: 'Message sent to admin successfully',
+    data: message,
+  };
 };

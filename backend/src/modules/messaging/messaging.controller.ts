@@ -81,3 +81,14 @@ export const deleteMessage = catchAsync(async (req: Request, res: Response) => {
   await messagingService.deleteMessage(messageId, userId);
   res.status(200).json({ success: true, message: 'Message deleted successfully' });
 });
+
+export const sendContactMessage = catchAsync(async (req: Request, res: Response) => {
+  const { firstName, lastName, email, message } = req.body;
+
+  if (!email || !message) {
+    throw new ApiError(400, 'Email and message are required');
+  }
+
+  const result = await messagingService.sendContactMessage({ firstName, lastName, email, message });
+  res.status(201).json(result);
+});

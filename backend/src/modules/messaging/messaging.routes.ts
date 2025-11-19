@@ -4,6 +4,9 @@ import * as messagingController from './messaging.controller';
 
 const router = Router();
 
+// Public contact form endpoint (no authentication required)
+router.post('/contact', messagingController.sendContactMessage);
+
 // All messaging routes require authentication
 router.use(authenticate);
 

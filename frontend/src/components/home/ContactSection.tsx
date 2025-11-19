@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { toast } from 'react-toastify';
+import { httpClient } from '../../api/httpClient';
 
 import styles from './ContactSection.module.css';
 
@@ -25,12 +26,18 @@ const ContactSection = () => {
 
     try {
       setIsSubmitting(true);
-      // TODO: Integrate with backend contact endpoint.
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      // Send contact message to admin
+      await httpClient.post('/messages/contact', {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        message: form.message,
+      });
       toast.success('Thanks for reaching out! We will contact you shortly.');
       setForm(initialFormState);
-    } catch (error) {
-      toast.error('Failed to send your message. Please try again.');
+    } catch (error: any) {
+      console.error('Contact form error:', error);
+      toast.error(error.response?.data?.message || 'Failed to send your message. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
