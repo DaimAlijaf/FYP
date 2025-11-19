@@ -66,7 +66,7 @@
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #0db4bc;
+  accent-color: #1976d2;
 }
 
 .filterCheckbox label {
@@ -90,7 +90,7 @@
 
 .filterSelect:focus {
   outline: none;
-  border-color: #0db4bc;
+  border-color: #1976d2;
 }
 
 .dateInput {
@@ -136,7 +136,7 @@
 .backToDashboardSidebar {
   background: none;
   border: none;
-  color: #0db4bc;
+  color: #1976d2;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -150,7 +150,7 @@
 
 .backToDashboardSidebar:hover {
   background: #f0fdfe;
-  color: #0ca1a8;
+  color: #1565c0;
 }
 
 .logoImage {
@@ -162,7 +162,7 @@
 .logoText {
   font-size: 18px;
   font-weight: 700;
-  color: #0db4bc;
+  color: #1976d2;
   margin: 0;
 }
 
@@ -189,7 +189,7 @@
 
 .topBarBtn:hover {
   background: #f8f9fa;
-  color: #0db4bc;
+  color: #1976d2;
 }
 
 .notificationBadge {
@@ -217,7 +217,7 @@
 }
 
 .userAvatar:hover {
-  border-color: #0db4bc;
+  border-color: #1976d2;
 }
 
 .conversationsHeader {
@@ -239,7 +239,7 @@
 }
 
 .unreadBadge {
-  background: #0db4bc;
+  background: #1976d2;
   color: #ffffff;
   font-size: 11px;
   font-weight: 600;
@@ -257,7 +257,7 @@
 }
 
 .dropdownIcon:hover {
-  color: #0db4bc;
+  color: #1976d2;
 }
 
 .searchContainer {
@@ -289,7 +289,7 @@
 
 .searchInput:focus {
   outline: none;
-  border-color: #0db4bc;
+  border-color: #1976d2;
   background: #ffffff;
   box-shadow: 0 0 0 3px rgba(13, 180, 188, 0.1);
 }
@@ -321,7 +321,7 @@
 
 .conversationItem.activeConversation {
   background: #e7f9fa;
-  border-left: 3px solid #0db4bc;
+  border-left: 3px solid #1976d2;
 }
 
 .conversationItem.activeConversation::after {
@@ -331,7 +331,7 @@
   top: 0;
   bottom: 0;
   width: 3px;
-  background: #0db4bc;
+  background: #1976d2;
 }
 
 .conversationAvatar {
@@ -418,7 +418,7 @@
 }
 
 .unreadCount {
-  background: #0db4bc;
+  background: #1976d2;
   color: #ffffff;
   font-size: 10px;
   font-weight: 700;
@@ -466,7 +466,7 @@
 .backToDashboard {
   background: none;
   border: none;
-  color: #0db4bc;
+  color: #1976d2;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -480,7 +480,7 @@
 
 .backToDashboard:hover {
   background: #f0fdfe;
-  color: #0ca1a8;
+  color: #1565c0;
 }
 
 .chatHeaderAvatar img {
@@ -556,7 +556,7 @@
 
 .headerActionBtn:hover {
   background: #f8f9fa;
-  color: #0db4bc;
+  color: #1976d2;
 }
 
 /* Messages Container */
@@ -690,7 +690,7 @@
 }
 
 .sentMessage .messageText {
-  background: linear-gradient(135deg, #0db4bc 0%, #0ca1a8 100%);
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
   color: #ffffff;
   border-bottom-right-radius: 4px;
   box-shadow: 0 2px 4px rgba(13, 180, 188, 0.2);
@@ -731,7 +731,7 @@
 }
 
 .inputWrapper:focus-within {
-  border-color: #0db4bc;
+  border-color: #1976d2;
   background: #ffffff;
   box-shadow: 0 0 0 3px rgba(13, 180, 188, 0.1);
 }
@@ -752,7 +752,7 @@
 }
 
 .attachmentBtn:hover {
-  color: #0db4bc;
+  color: #1976d2;
   background: #e7f9fa;
 }
 
@@ -795,12 +795,12 @@
 }
 
 .emojiBtn:hover {
-  color: #0db4bc;
+  color: #1976d2;
   background: #e7f9fa;
 }
 
 .sendBtn {
-  background: linear-gradient(135deg, #0db4bc 0%, #0ca1a8 100%);
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
   color: #ffffff;
   border: none;
   width: 44px;

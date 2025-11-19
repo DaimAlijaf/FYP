@@ -1671,7 +1671,7 @@
 .viewAllMessagesButton {
   background: none;
   border: none;
-  color: #0db4bc;
+  color: #1976d2;
   font-family: 'Reddit Sans', sans-serif;
   font-size: 14px;
   font-weight: 500;
@@ -1696,7 +1696,7 @@
 .openMessagesButton {
   width: 100%;
   padding: 14px 20px;
-  background: linear-gradient(135deg, #0db4bc 0%, #0a8f95 100%);
+  background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -1709,7 +1709,7 @@
 }
 
 .openMessagesButton:hover {
-  background: linear-gradient(135deg, #0a8f95 0%, #086c71 100%);
+  background: linear-gradient(135deg, #0d47a1 0%, #086c71 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(13, 180, 188, 0.3);
 }

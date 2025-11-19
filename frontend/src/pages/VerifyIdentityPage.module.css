@@ -362,7 +362,7 @@
 .select:focus,
 .textarea:focus {
   outline: none;
-  border-color: #79b3b8;
+  border-color: #42a5f5;
   box-shadow: 0 0 0 3px rgba(121, 179, 184, 0.1);
 }
 
@@ -378,7 +378,7 @@
   font-size: 16px;
   font-weight: 600;
   color: #ffffff;
-  background: #79b3b8;
+  background: #42a5f5;
   border: none;
   border-radius: 12px;
   cursor: pointer;
