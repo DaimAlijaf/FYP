@@ -147,6 +147,11 @@ const BuyerDashboardPage = () => {
   const [proposalsError, setProposalsError] = useState('');
   const [consultants, setConsultants] = useState<any[]>([]);
   const [consultantsLoading, setConsultantsLoading] = useState(false);
+  
+  // Filter states
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
     // Get current user from localStorage
@@ -221,7 +226,7 @@ const BuyerDashboardPage = () => {
         title: c.title,
         category: c.specialization?.[0] || 'General',
         rating: c.rating || 0,
-        location: 'Pakistan', // Can be added to consultant model later
+        location: c.location || 'Pakistan',
         specialization: Array.isArray(c.specialization) ? c.specialization.join(', ') : c.specialization,
         bio: c.bio || '',
         hourlyRate: `Rs ${c.hourlyRate?.toLocaleString()}/hr`,
@@ -238,6 +243,51 @@ const BuyerDashboardPage = () => {
       setConsultantsLoading(false);
     }
   };
+
+  // Filter handlers
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(category) 
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const handleLocationChange = (location: string) => {
+    setSelectedLocation(location);
+  };
+
+  // Filtered consultants based on selected filters
+  const filteredConsultants = consultants.filter(consultant => {
+    // Filter by category
+    if (selectedCategories.length > 0) {
+      const consultantCategory = consultant.category?.toLowerCase();
+      const matchesCategory = selectedCategories.some(cat => 
+        consultantCategory?.includes(cat.toLowerCase())
+      );
+      if (!matchesCategory) return false;
+    }
+
+    // Filter by location
+    if (selectedLocation && selectedLocation !== '') {
+      if (!consultant.location?.toLowerCase().includes(selectedLocation.toLowerCase())) {
+        return false;
+      }
+    }
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      const matchesSearch = 
+        consultant.name?.toLowerCase().includes(query) ||
+        consultant.title?.toLowerCase().includes(query) ||
+        consultant.specialization?.toLowerCase().includes(query) ||
+        consultant.bio?.toLowerCase().includes(query);
+      if (!matchesSearch) return false;
+    }
+
+    return true;
+  });
 
   const fetchProposals = async () => {
     try {
@@ -755,26 +805,43 @@ const BuyerDashboardPage = () => {
             <div className={styles.filterGroup}>
               <h4 className={styles.filterTitle}>Consultancy Type</h4>
               <label className={styles.checkbox}>
-                <input type="checkbox" />
+                <input 
+                  type="checkbox" 
+                  checked={selectedCategories.includes('Education')}
+                  onChange={() => handleCategoryChange('Education')}
+                />
                 <span>Education</span>
               </label>
               <label className={styles.checkbox}>
-                <input type="checkbox" />
+                <input 
+                  type="checkbox"
+                  checked={selectedCategories.includes('Legal')}
+                  onChange={() => handleCategoryChange('Legal')}
+                />
                 <span>Legal</span>
               </label>
               <label className={styles.checkbox}>
-                <input type="checkbox" />
+                <input 
+                  type="checkbox"
+                  checked={selectedCategories.includes('Business')}
+                  onChange={() => handleCategoryChange('Business')}
+                />
                 <span>Business</span>
               </label>
             </div>
 
             <div className={styles.filterGroup}>
               <h4 className={styles.filterTitle}>Location</h4>
-              <select className={styles.select}>
-                <option>Select Location</option>
-                <option>London, United Kingdom</option>
-                <option>New York, USA</option>
-                <option>Dubai, UAE</option>
+              <select 
+                className={styles.select}
+                value={selectedLocation}
+                onChange={(e) => handleLocationChange(e.target.value)}
+              >
+                <option value="">Select Location</option>
+                <option value="Karachi">Karachi</option>
+                <option value="Lahore">Lahore</option>
+                <option value="Islamabad">Islamabad</option>
+                <option value="Rawalpindi">Rawalpindi</option>
               </select>
             </div>
           </div>
@@ -784,7 +851,13 @@ const BuyerDashboardPage = () => {
         <main className={styles.centerContent}>
           {/* Search Bar */}
           <div className={styles.searchBar}>
-            <input type="text" placeholder="Search Consultants" className={styles.searchInput} />
+            <input 
+              type="text" 
+              placeholder="Search Consultants" 
+              className={styles.searchInput}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
 
           {/* Post Job Button */}
@@ -796,12 +869,12 @@ const BuyerDashboardPage = () => {
           <div className={styles.projectList}>
             {consultantsLoading ? (
               <div className={styles.loadingState}>Loading consultants...</div>
-            ) : consultants.length === 0 ? (
+            ) : filteredConsultants.length === 0 ? (
               <div className={styles.emptyState}>
-                <p>No consultants available at the moment.</p>
+                <p>No consultants found matching your filters.</p>
               </div>
             ) : (
-              consultants.map((consultant) => (
+              filteredConsultants.map((consultant) => (
                 <div key={consultant.id} className={styles.projectCard}>
                   <div className={styles.projectHeader}>
                     {consultant.avatar ? (

@@ -21,6 +21,7 @@ export interface IConsultant {
   availability: 'available' | 'limited' | 'unavailable';  // Current availability status
   experience: string;               // Years/description of experience
   skills: string[];                 // Technical skills and competencies (maps to diagram)
+  location?: string;                // Consultant's location (city)
   
   // Verification Documents (for Admin verification via VerifyConsultant())
   idCardFront?: string;             // URL to ID card front image
@@ -67,6 +68,7 @@ const consultantSchema = new Schema<ConsultantDocument, ConsultantModel>(
     },
     experience: { type: String, required: true },
     skills: { type: [String], default: [] },
+    location: { type: String, trim: true },
     
     // Verification documents (uploadverificationdocs() in diagram)
     idCardFront: { type: String },
